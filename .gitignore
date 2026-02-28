@@ -1,0 +1,19 @@
+# Environnement et secrets
+.env
+*.log
+
+# OpenClaw
+.openclaw/
+
+# Claude Code
+.claude/
+
+# Node
+node_modules/
+
+# Fichiers de reference internes (pas dans le repo)
+files/
+
+# OS
+.DS_Store
+Thumbs.db
