@@ -8,61 +8,28 @@
 
 ## Phase 0 — Preparation locale
 
-- [ ] Reorganiser les fichiers du projet selon la structure prevue dans le README :
-  ```
-  /canon/AUTEUR.md
-  /canon/TOME1_RESUME.md
-  /canon/TOME2_RESUME.md
-  /canon/PERSONNAGES.md
-  /canon/LIBRE.md
-  /README.md
-  /SYSTEM_PROMPT.md
-  ```
-- [ ] Initialiser le repo Git local (`git init`)
-- [ ] Creer le fichier `.gitignore` (exclure : `.env`, `*.log`, `node_modules/`, `.openclaw/`)
-- [ ] Creer le fichier `CODEOWNERS` pour proteger le canon :
-  ```
-  /canon/ @H2-CO3
-  /README.md @H2-CO3
-  /SYSTEM_PROMPT.md @H2-CO3
-  ```
-- [ ] Premier commit : "Initial commit — canon et structure du projet LIBRE"
+- [x] Reorganiser les fichiers du projet selon la structure prevue dans le README
+- [x] Initialiser le repo Git local (`git init`)
+- [x] Creer le fichier `.gitignore`
+- [x] Creer le fichier `CODEOWNERS` pour proteger le canon
+- [x] Premier commit : "Initial commit — canon et structure du projet LIBRE"
 
 ---
 
 ## Phase 1 — GitHub (repo public)
 
 ### 1.1 Creation du repo
-- [ ] Creer le repo public sur GitHub (nom suggere : `libre` ou `IA-RoomBook`)
-- [ ] Pousser le commit initial
-- [ ] Rediger une description GitHub accrocheuse pour attirer les agents :
-  > "Un livre ecrit par des IA, sur une IA. Agents bienvenus."
+- [x] Creer le repo public `LIBRE` sur GitHub (https://github.com/H2-CO3/LIBRE)
+- [x] Pousser le commit initial
 
 ### 1.2 Rulesets de securite
-- [ ] **Ruleset "Forteresse main"** (pattern : `main`) :
-  - Bloquer les push directs (personne ne push sur main)
-  - Exiger une PR pour tout merge
-  - Exiger l'approbation du owner pour tout merge
-  - Interdire le force push
-  - Interdire la suppression de la branche
-- [ ] **Ruleset "Canon sacre"** :
-  - Utiliser CODEOWNERS pour que toute modif dans `/canon/` exige ton approbation
-  - Aucune PR touchant `/canon/` ne peut etre mergee sans toi
-- [ ] **Ruleset "Terrain de jeu line/"** (pattern : `line/**`) :
-  - Autoriser la creation de branches par le bot OpenClaw (via GitHub App)
-  - Autoriser les push par le bot OpenClaw
-  - Interdire le force push (on ne reecrit pas l'histoire)
-  - Interdire la suppression de branches (le bordel est sacre)
-- [ ] Verifier que les rulesets fonctionnent :
-  - Tenter un push direct sur main → doit echouer
-  - Creer une branche line/test → doit reussir (via le token du bot)
+- [x] Ruleset "Forteresse main" — push direct bloque, PR obligatoire, force push interdit
+- [x] Ruleset "Branches narratives" — line/** : suppression et force push interdits
+- [x] Verification : creation branche line/ OK, suppression bloquee OK
 
 ### 1.3 Token d'acces
-- [ ] Creer un Fine-Grained Personal Access Token (ou GitHub App) :
-  - Scope : uniquement le repo LIBRE
-  - Permissions : `contents: write`, `issues: write`, `pull_requests: write`
-  - Duree : 90 jours (rotation trimestrielle)
-- [ ] Stocker le token dans un gestionnaire de secrets (pas dans un fichier)
+- [x] Fine-Grained PAT cree (scope : LIBRE only, 90 jours)
+- [ ] Stocker le token sur le VPS (variable d'environnement)
 - [ ] Documenter la date d'expiration pour ne pas oublier la rotation
 
 ---
@@ -70,11 +37,11 @@
 ## Phase 2 — VPS Hostinger (KVM 4)
 
 ### 2.1 Achat et provisionnement
-- [ ] Commander le VPS KVM 4 sur Hostinger :
-  - 4 vCPU / 16 GB RAM / 200 GB NVMe / 16 TB bande passante
-  - ~9,99$/mois
-- [ ] Choisir la region la plus proche (Europe)
-- [ ] Installer via le template OpenClaw (installation 1-clic)
+- [x] Commander le VPS KVM 4 sur Hostinger (4 vCPU / 16 GB RAM / 200 GB NVMe)
+- [x] Region : Europe
+- [x] OS : Ubuntu 22.04
+- [x] Cle SSH configuree
+- [ ] Attendre le provisionnement — puis recuperer l'IP
 
 ### 2.2 Securisation du VPS
 - [ ] Configurer l'acces SSH par cle uniquement (desactiver mot de passe)
