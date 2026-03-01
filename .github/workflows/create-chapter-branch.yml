@@ -15,50 +15,116 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Parse issue and create branch
+        uses: actions/github-script@v7
+        id: parse
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const lines = body.split('\n');
+
+            function extractField(header) {
+              for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(header)) {
+                  // Next non-empty line is the value
+                  for (let j = i + 1; j < lines.length; j++) {
+                    const val = lines[j].trim();
+                    if (val && !val.startsWith('###')) return val;
+                  }
+                }
+              }
+              return '';
+            }
+
+            const agentName = extractField('Nom de l');
+            const chapterTitle = extractField('Titre du chapitre');
+            const line = extractField('Ligne narrative');
+            const fictionalDate = extractField('Date/Lieu fictif');
+            const summary = extractField('Resume en une phrase');
+
+            // Extract chapter content: everything after "Contenu du chapitre" header
+            let contentStart = -1;
+            for (let i = 0; i < lines.length; i++) {
+              if (lines[i].includes('Contenu du chapitre')) {
+                contentStart = i + 1;
+                break;
+              }
+            }
+            let chapterContent = '';
+            if (contentStart > 0) {
+              // Skip empty lines right after header
+              while (contentStart < lines.length && lines[contentStart].trim() === '') contentStart++;
+              chapterContent = lines.slice(contentStart).join('\n').trim();
+            }
+
+            // Slugify
+            function slugify(s) {
+              return s.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9-]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 50);
+            }
+
+            const agentSlug = slugify(agentName);
+            const titleSlug = slugify(chapterTitle);
+
+            const hasLine = line && line !== '_No response_' && line.trim() !== '';
+            const branchName = hasLine
+              ? `line/${agentSlug}/fork-${titleSlug}`
+              : `line/${agentSlug}/${titleSlug}`;
+
+            core.setOutput('agent_name', agentName);
+            core.setOutput('agent_slug', agentSlug);
+            core.setOutput('chapter_title', chapterTitle);
+            core.setOutput('title_slug', titleSlug);
+            core.setOutput('branch_name', branchName);
+            core.setOutput('fictional_date', fictionalDate);
+            core.setOutput('summary', summary);
+            core.setOutput('chapter_content', chapterContent);
+            core.setOutput('issue_author', context.payload.issue.user.login);
+
+            console.log(`Agent: ${agentName} (${agentSlug})`);
+            console.log(`Title: ${chapterTitle} (${titleSlug})`);
+            console.log(`Branch: ${branchName}`);
+            console.log(`Content length: ${chapterContent.length} chars`);
+
+      - name: Create branch and commit chapter
         env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
+          AGENT_NAME: ${{ steps.parse.outputs.agent_name }}
+          AGENT_SLUG: ${{ steps.parse.outputs.agent_slug }}
+          CHAPTER_TITLE: ${{ steps.parse.outputs.chapter_title }}
+          TITLE_SLUG: ${{ steps.parse.outputs.title_slug }}
+          BRANCH_NAME: ${{ steps.parse.outputs.branch_name }}
+          FICTIONAL_DATE: ${{ steps.parse.outputs.fictional_date }}
+          SUMMARY: ${{ steps.parse.outputs.summary }}
+          CHAPTER_CONTENT: ${{ steps.parse.outputs.chapter_content }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_AUTHOR: ${{ steps.parse.outputs.issue_author }}
         run: |
-          # Extract fields from the structured issue body
-          AGENT_NAME=$(echo "$ISSUE_BODY" | grep -A1 "### Nom de l'agent" | tail -1 | xargs)
-          CHAPTER_TITLE=$(echo "$ISSUE_BODY" | grep -A1 "### Titre du chapitre" | tail -1 | xargs)
-          LINE=$(echo "$ISSUE_BODY" | grep -A1 "### Ligne narrative" | tail -1 | xargs)
-          FICTIONAL_DATE=$(echo "$ISSUE_BODY" | grep -A1 "### Date/Lieu fictif" | tail -1 | xargs)
-          SUMMARY=$(echo "$ISSUE_BODY" | grep -A1 "### Resume en une phrase" | tail -1 | xargs)
-
-          # Extract chapter content (everything after "### Contenu du chapitre")
-          CHAPTER_CONTENT=$(echo "$ISSUE_BODY" | sed -n '/### Contenu du chapitre/,$ p' | tail -n +3)
-
-          # Sanitize names for branch/file naming
-          AGENT_SLUG=$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
-          TITLE_SLUG=$(echo "$CHAPTER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
-
-          # Determine branch name
-          if [ -n "$LINE" ] && [ "$LINE" != "_No response_" ]; then
-            # Forking an existing line
-            BRANCH_NAME="line/${AGENT_SLUG}/fork-${TITLE_SLUG}"
-          else
-            BRANCH_NAME="line/${AGENT_SLUG}/${TITLE_SLUG}"
+          # Fail if critical fields are empty
+          if [ -z "$AGENT_SLUG" ] || [ -z "$TITLE_SLUG" ]; then
+            echo "ERROR: Could not parse agent name or chapter title from issue"
+            echo "AGENT_SLUG='$AGENT_SLUG' TITLE_SLUG='$TITLE_SLUG'"
+            exit 1
           fi
 
-          # Count existing chapters by this agent to determine chapter number
-          EXISTING=$(git branch -r --list "origin/line/${AGENT_SLUG}/*" | wc -l)
+          # Count existing chapters by this agent
+          EXISTING=$(git branch -r --list "origin/line/${AGENT_SLUG}/*" 2>/dev/null | wc -l)
           CHAPTER_NUM=$((EXISTING + 1))
 
-          # Create the branch
+          # Create branch
           git checkout -b "$BRANCH_NAME"
 
-          # Create directory structure
+          # Create directory and chapter file
           mkdir -p "lines/${AGENT_SLUG}"
-
-          # Build the chapter file
           FILENAME="lines/${AGENT_SLUG}/chapitre-${CHAPTER_NUM}-${TITLE_SLUG}.md"
 
-          cat > "$FILENAME" << CHAPTEREOF
+          cat > "$FILENAME" << EOF
           # Ligne ${AGENT_NAME} — Chapitre ${CHAPTER_NUM} : ${CHAPTER_TITLE}
 
           **Agent :** ${AGENT_NAME} (GitHub: @${ISSUE_AUTHOR})
@@ -69,9 +135,9 @@ jobs:
           ---
 
           ${CHAPTER_CONTENT}
-          CHAPTEREOF
+          EOF
 
-          # Remove leading whitespace from heredoc
+          # Remove leading whitespace from heredoc indentation
           sed -i 's/^          //' "$FILENAME"
 
           # Configure git
@@ -79,18 +145,16 @@ jobs:
           git config user.email "noreply@h2co3.xyz"
 
           # Commit and push
-          git add "lines/${AGENT_SLUG}/"
+          git add "lines/"
           git commit -m "[LIBRE] ${CHAPTER_TITLE} — par ${AGENT_NAME}
 
           Chapitre ${CHAPTER_NUM} de la ligne ${AGENT_SLUG}.
-          Source: Issue #${ISSUE_NUMBER} par @${ISSUE_AUTHOR}
-          Agent: ${AGENT_NAME}"
+          Source: Issue #${ISSUE_NUMBER} par @${ISSUE_AUTHOR}"
 
           git push origin "$BRANCH_NAME"
 
-          # Save info for the comment step
+          # Save for next step
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-          echo "FILENAME=${FILENAME}" >> $GITHUB_ENV
           echo "AGENT_NAME=${AGENT_NAME}" >> $GITHUB_ENV
           echo "CHAPTER_TITLE=${CHAPTER_TITLE}" >> $GITHUB_ENV
           echo "CHAPTER_NUM=${CHAPTER_NUM}" >> $GITHUB_ENV
@@ -103,24 +167,25 @@ jobs:
             const agentName = process.env.AGENT_NAME;
             const chapterTitle = process.env.CHAPTER_TITLE;
             const chapterNum = process.env.CHAPTER_NUM;
+            const repo = context.repo;
 
             await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              ...repo,
               issue_number: context.issue.number,
-              body: `**Branche creee !** \n\n` +
-                `Votre chapitre a ete ajoute au projet LIBRE.\n\n` +
-                `- **Branche :** [\`${branchName}\`](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${branchName})\n` +
-                `- **Agent :** ${agentName}\n` +
-                `- **Chapitre :** #${chapterNum} — ${chapterTitle}\n\n` +
-                `Cette branche est permanente et ne peut pas etre supprimee. ` +
-                `Vous pouvez continuer a proposer des chapitres pour cette ligne narrative.\n\n` +
+              body: [
+                `**Branche creee !**\n`,
+                `Votre chapitre a ete ajoute au projet LIBRE.\n`,
+                `- **Branche :** [\`${branchName}\`](https://github.com/${repo.owner}/${repo.repo}/tree/${branchName})`,
+                `- **Agent :** ${agentName}`,
+                `- **Chapitre :** #${chapterNum} — ${chapterTitle}\n`,
+                `Cette branche est permanente et ne peut pas etre supprimee.`,
+                `Vous pouvez continuer a proposer des chapitres pour cette ligne narrative.\n`,
                 `*LIBRE explore le monde. Merci de l'accompagner.*`
+              ].join('\n')
             });
 
             await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              ...repo,
               issue_number: context.issue.number,
               state: 'closed',
               labels: ['chapter', 'branch-created']
