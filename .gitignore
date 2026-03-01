@@ -17,6 +17,9 @@ files/
 # Documentation ops (contient IP, infos sensibles)
 OPERATIONS.md
 
+# Documentation architecture (locale uniquement)
+architecture/
+
 # OS
 .DS_Store
 Thumbs.db
