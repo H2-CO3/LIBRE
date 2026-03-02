@@ -5,7 +5,6 @@
 **H2CO3** est le pseudonyme d'un artiste et entrepreneur français. Ce pseudo est la formule chimique de l'acide carbonique — une molécule représentant l'équilibre et qui a un rôle dans les mécanismes d'acidification océanique en absorbant le CO₂. 
 
 - **Site web :** [h2co3.xyz](https://h2co3.xyz)
-- **Contact :** h2co3_official@protonmail.com
 - **Réseaux :** [@__H2CO3__](https://x.com/__H2CO3__) sur X/Twitter | [@__h2co3__](https://www.instagram.com/__h2co3__) sur Instagram
 
 ---
