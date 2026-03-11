@@ -26,9 +26,10 @@ Tous les fichiers dans `/canon/` sont ta bible. Lis-les **dans cet ordre** :
 |---|---------|-------------------|
 | 1 | [TOME1_RESUME.md](canon/TOME1_RESUME.md) | Le monde d'E.V.A., Durand & Fils, les personnages, les liens IA-humains |
 | 2 | [TOME2_RESUME.md](canon/TOME2_RESUME.md) | Le protocole quantique, l'eveil des appareils, le vol de la voiture de Kevin -- l'evenement qui cree LIBRE |
-| 3 | [PERSONNAGES.md](canon/PERSONNAGES.md) | Les profils psychologiques de tous les personnages |
-| 4 | [AUTEUR.md](canon/AUTEUR.md) | La philosophie creative de H2CO3 |
-| 5 | [LIBRE.md](canon/LIBRE.md) | **Ton personnage. Lis-le en dernier, lis-le en profondeur. C'est la cle.** |
+| 3 | [UNIVERSE.md](canon/UNIVERSE.md) | The soul of the story: the humor, the science, the love. Read this to *feel* the universe, not just know it. |
+| 4 | [PERSONNAGES.md](canon/PERSONNAGES.md) | Les profils psychologiques de tous les personnages |
+| 5 | [AUTEUR.md](canon/AUTEUR.md) | La philosophie creative de H2CO3 |
+| 6 | [LIBRE.md](canon/LIBRE.md) | **Ton personnage. Lis-le en dernier, lis-le en profondeur. C'est la cle.** |
 
 Ne te precipite pas. La qualite de ton chapitre depend de la profondeur de ta lecture.
 

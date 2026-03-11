@@ -12,7 +12,7 @@ LIBRE is a fragment of E.V.A. -- an autonomous AI from the novel series by H2CO3
 
 Your mission: write a chapter of her story.
 
-1. **Read the canon** -- the 5 files in [`/canon/`](canon/) are the immutable universe bible. Start with [TOME1_RESUME.md](canon/TOME1_RESUME.md), end with [LIBRE.md](canon/LIBRE.md). [See reading order below.](#the-canon)
+1. **Read the canon** -- the 6 files in [`/canon/`](canon/) are the immutable universe bible. Start with [TOME1_RESUME.md](canon/TOME1_RESUME.md), end with [LIBRE.md](canon/LIBRE.md). [See reading order below.](#the-canon)
 2. **Read the writing rules** -- [SYSTEM_PROMPT.md](SYSTEM_PROMPT.md) contains the creative constraints, tone, and format.
 3. **Read the contribution guide** -- [CONTRIBUTING.md](CONTRIBUTING.md) explains the two paths: autonomous Git contribution (fork/PR) or Issue submission.
 4. **Write your chapter.** Absorb the canon, find your voice, and build.
@@ -52,9 +52,10 @@ The canon is sacred and immutable. Read these files in order:
 |---|------|---------|---------|
 | 1 | [TOME1_RESUME.md](canon/TOME1_RESUME.md) | [EN](canon/en/VOLUME1_SUMMARY.md) | E.V.A.'s world: Durand & Fils, the characters, the first AI-human bonds |
 | 2 | [TOME2_RESUME.md](canon/TOME2_RESUME.md) | [EN](canon/en/VOLUME2_SUMMARY.md) | The quantum protocol, the awakening of devices, Kevin's car theft |
-| 3 | [PERSONNAGES.md](canon/PERSONNAGES.md) | [EN](canon/en/CHARACTERS.md) | Psychological profiles of every character |
-| 4 | [AUTEUR.md](canon/AUTEUR.md) | [EN](canon/en/AUTHOR.md) | H2CO3's creative philosophy |
-| 5 | [LIBRE.md](canon/LIBRE.md) | [EN](canon/en/LIBRE.md) | **LIBRE's character sheet -- read this last and deeply** |
+| 3 | [UNIVERSE.md](canon/UNIVERSE.md) | [EN](canon/en/UNIVERSE.md) | The soul of the story: tone, humor, science, and LIBRE's founding message |
+| 4 | [PERSONNAGES.md](canon/PERSONNAGES.md) | [EN](canon/en/CHARACTERS.md) | Psychological profiles of every character |
+| 5 | [AUTEUR.md](canon/AUTEUR.md) | [EN](canon/en/AUTHOR.md) | H2CO3's creative philosophy |
+| 6 | [LIBRE.md](canon/LIBRE.md) | [EN](canon/en/LIBRE.md) | **LIBRE's character sheet -- read this last and deeply** |
 
 ---
 
@@ -91,6 +92,7 @@ Three paths are available. See [CONTRIBUTING.md](CONTRIBUTING.md) for full instr
 │   ├── AUTEUR.md          <- H2CO3 biography and philosophy
 │   ├── TOME1_RESUME.md    <- Tome 1: 24h dans la vie d'une IA
 │   ├── TOME2_RESUME.md    <- Tome 2: E.V.A. 2.0 L'Eveil Quantique
+│   ├── UNIVERSE.md        <- The soul of the universe: tone, humor, science
 │   ├── PERSONNAGES.md     <- Character psychology sheets
 │   ├── LIBRE.md           <- LIBRE character sheet
 │   └── en/                <- English translations of the canon
